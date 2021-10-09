@@ -86,8 +86,8 @@ const debounce = (func) => {
 window.addEventListener(
   "resize",
   debounce(() => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = container.clientWidth;
+    canvas.height = container.clientHeight;
   })
 );
 
@@ -148,6 +148,8 @@ function flatToSharp(note) {
 
 /*Split the requested note and octave string using a regular expression into two seperate variables.
 Use these variables to return the nearest note available from the desired instrument within the SAMPLE_LIBRARY*/
+let pRate = randNum(2, 7);
+
 function getSample(instrument, noteAndOctave) {
   let [, requestedNote, requestedOctave] = /^(\w[b\#]?)(\d)$/.exec(noteAndOctave);
   requestedOctave = parseInt(requestedOctave, 10);
@@ -176,7 +178,7 @@ function playSample(instrument, note, destination, delaySeconds = 0) {
     let bufferSource = audioContext.createBufferSource();
 
     bufferSource.buffer = audioBuffer;
-    bufferSource.playbackRate.value = playbackRate / 4;
+    bufferSource.playbackRate.value = playbackRate / pRate;
 
     bufferSource.connect(destination);
     // the time at which the note should start playing, relative to the AudioContext's current time
@@ -186,7 +188,13 @@ function playSample(instrument, note, destination, delaySeconds = 0) {
 
 // Animate the visuals for notes playing
 function render() {
+  context.fillStyle = '#000';
   context.fillRect(0, 0, window.innerWidth, window.innerHeight);
+
+  context.font = '48px serif';
+  context.fillStyle = '#AED6F1';
+  context.fillText('Click to Play/Stop', canvas.width / 2 - 48 * 4, 50);
+  context.fillText('Refresh page for new loop', canvas.width / 2 - 48 * 5.5, 100);
 
   context.save();
   context.translate(window.innerWidth / 2, window.innerHeight / 2);
